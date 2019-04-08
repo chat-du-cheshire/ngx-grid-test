@@ -1,2 +1,20 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~bootstrap";
+@import "~node_modules/bootstrap/scss/bootstrap";
+
+@import '~@swimlane/ngx-datatable/release/index.css';
+@import '~@swimlane/ngx-datatable/release/themes/bootstrap.css';
+
+.page {
+  height: 100vh;
+
+  &__content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__route {
+    height: 100%;
+    overflow: auto;
+  }
+}

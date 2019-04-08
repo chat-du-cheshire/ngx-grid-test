@@ -1,0 +1,8 @@
+<ngx-datatable class="bootstrap"
+               [scrollbarV]="true"
+               [columns]="state.ngxColumns"
+               [rowHeight]="list.itemHeight"
+               [headerHeight]="list.headerHeight"
+               [footerHeight]="0"
+               [rows]="list.items"
+               (scroll)="list.onScroll($event, el)"></ngx-datatable>
