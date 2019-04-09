@@ -6,10 +6,14 @@ import {MoviesAgGridComponent} from './components/movies-ag-grid/movies-ag-grid.
 import {MoviesNgxDatatableComponent} from './components/movies-ngx-datatable/movies-ngx-datatable.component';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {HttpClientModule} from '@angular/common/http';
+import {MoviesResolver} from './services/movies.resolver';
 
 const moviesRoutes: Route[] = [{
   path: 'movies',
   component: MoviesPageComponent,
+  resolve: {
+    movies: MoviesResolver
+  },
   children: [{
     path: 'ag-grid',
     component: MoviesAgGridComponent

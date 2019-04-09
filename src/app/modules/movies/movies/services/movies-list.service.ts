@@ -4,7 +4,7 @@ import {environment} from '../../../../../environments/environment';
 import {IMovie} from '../interfaces/IMovie';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {take, tap} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root'
@@ -18,21 +18,31 @@ export class MoviesListService {
   url = `${environment.api}/movies`;
 
   items: IMovie[] = null;
+  protected handleScroll: (...args: any[]) => void;
 
   constructor(private http: HttpClient) {
   }
 
-  makeRequest(isRefresh = false) {
-    const params = this.getRequestParams();
-    this.isLoading = true;
-    this.http.get<IMovie[]>(this.url, {params})
-      .pipe(take(1))
-      .subscribe((items) => {
-        this.isLoading = false;
-        this.items = this.items && !isRefresh ? [...this.items, ...items] : items;
-      });
+  /**
+   * Установка обработчка прокрутки
+   * @param fn - функция обработчик
+   */
+  setScrollHandler(fn: (...args: any[]) => void) {
+    this.handleScroll = fn;
   }
 
+  /**
+   * Запрос данных на сервер
+   */
+  makeRequest() {
+    const params = this.getRequestParams();
+    this.isLoading = true;
+    return this.http.get<IMovie[]>(this.url, {params});
+  }
+
+  /**
+   * Параметры запроса на сервер
+   */
   getRequestParams(): HttpParams {
     let params = new HttpParams();
     params = params.set('_page', String(this._currentPage++));
@@ -40,11 +50,47 @@ export class MoviesListService {
     return params;
   }
 
-  reload() {
-    this._currentPage = 1;
-    this.makeRequest(true);
+  /**
+   * Принудительная загрузка данных с сервера
+   */
+  load() {
+    this.subscribeRequest((items) => {
+      this.setItems(items);
+      this.handleScroll(0);
+    });
   }
 
+  /**
+   * Перезапрашиваем данные с сервера
+   */
+  reload() {
+    this._currentPage = 1;
+    this.load();
+  }
+
+  /**
+   * Отправка запроса на сервер и подписка на него
+   * @param fn - функция обработки подписки
+   */
+  protected subscribeRequest(fn: (items: IMovie[]) => void) {
+    this.makeRequest()
+      .pipe(take(1))
+      .subscribe(fn);
+  }
+
+  /**
+   * Метод для использования в Router Resolve. Осуществляет инициализацию списка после того как данные получены с сервера
+   */
+  resolve() {
+    return this.makeRequest()
+      .pipe(tap((items) => this.setItems(items)));
+  }
+
+  /**
+   * Обработчик события прокрутки списка
+   * @param $event - событие генерируемое таблицей
+   * @param wrap - обертка таблицы, для расчета высоты
+   */
   onScroll($event, wrap) {
     const offsetY = $event.offsetY;
     const itemsLength = (this.items || []).length;
@@ -54,7 +100,18 @@ export class MoviesListService {
 
     // check if we scrolled to the end of the viewport
     if (!this.isLoading && offsetY + viewHeight >= itemsLength * itemHeight) {
-      this.makeRequest();
+      this.subscribeRequest((items) => {
+        this.setItems([...this.items, ...items]);
+      });
     }
+  }
+
+  /**
+   * Функция обновления списка
+   * @param items - новый массив элементов
+   */
+  setItems(items: IMovie[]) {
+    this.isLoading = false;
+    this.items = items;
   }
 }
