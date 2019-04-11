@@ -6,4 +6,9 @@
                [headerHeight]="list.headerHeight"
                [footerHeight]="0"
                [rows]="list.items"
-               (scroll)="list.onScroll($event, el)"></ngx-datatable>
+               [selectionType]="'single'"
+               [rowClass]="list.rowClass()"
+               (activate)="list.onActivate($event)"
+               (scroll)="list.onScroll($event, el)">
+  
+</ngx-datatable>

@@ -4,7 +4,7 @@ import {environment} from '../../../../../environments/environment';
 import {IMovie} from '../interfaces/IMovie';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {take, tap} from 'rxjs/operators';
-
+import {xor} from 'lodash';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +19,10 @@ export class MoviesListService {
 
   items: IMovie[] = null;
   protected handleScroll: (...args: any[]) => void;
+
+  private _prevSelected = null;
+  selectedItem: IMovie[] = [];
+  checkedItems: IMovie[] = [];
 
   constructor(private http: HttpClient) {
   }
@@ -106,6 +110,38 @@ export class MoviesListService {
     }
   }
 
+  onActivate($event) {
+    console.log($event)
+    switch ($event.type) {
+      case 'click': {
+        this.selectItem($event.row);
+        if ($event.event.ctrlKey) {
+          this.toggleCheckedItem($event.row);
+        }
+        if ($event.event.shiftKey && this._prevSelected) {
+          const selected = this.items.indexOf($event.row);
+          const prev = this.items.indexOf(this._prevSelected);
+
+          this.checkedItems = this.items.slice(Math.min(selected, prev), Math.max(selected, prev) + 1);
+        }
+        break;
+      }
+      case 'dblclick': {
+        this.toggleCheckedItem($event.row);
+        break;
+      }
+    }
+  }
+
+  selectItem(item) {
+    this._prevSelected = this.selectedItem && this.selectedItem[0];
+    this.selectedItem = [item];
+  }
+
+  toggleCheckedItem(item) {
+    this.checkedItems = xor(this.checkedItems, [item]);
+  }
+
   /**
    * Функция обновления списка
    * @param items - новый массив элементов
@@ -113,5 +149,14 @@ export class MoviesListService {
   setItems(items: IMovie[]) {
     this.isLoading = false;
     this.items = items;
+  }
+
+  rowClass() {
+    const rowClass = (row) => ({
+      'row-selected': this.selectedItem && this.selectedItem.includes(row),
+      'row-checked': this.checkedItems && this.checkedItems.includes(row)
+    });
+
+    return rowClass;
   }
 }

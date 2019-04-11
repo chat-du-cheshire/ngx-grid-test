@@ -18,3 +18,15 @@
     overflow: auto;
   }
 }
+
+
+
+datatable-body-row {
+  &.row-checked {
+    background-color: #81bcff !important;
+  }
+
+  &.row-selected {
+    background-color: #1483ff !important;
+  }
+}
