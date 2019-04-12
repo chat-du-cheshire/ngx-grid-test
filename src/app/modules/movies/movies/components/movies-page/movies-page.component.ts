@@ -8,7 +8,7 @@ import {MoviesListService} from '../../services/movies-list.service';
 })
 export class MoviesPageComponent implements OnInit {
 
-  constructor(public list: MoviesListService) { }
+  constructor() { }
 
   ngOnInit() {
   }

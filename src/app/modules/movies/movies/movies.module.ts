@@ -7,24 +7,27 @@ import {MoviesNgxDatatableComponent} from './components/movies-ngx-datatable/mov
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {HttpClientModule} from '@angular/common/http';
 import {MoviesResolver} from './services/movies.resolver';
+import { StatusComponent } from './components/status/status.component';
+import {MoviesListService} from './services/movies-list.service';
 
 const moviesRoutes: Route[] = [{
   path: 'movies',
   component: MoviesPageComponent,
-  resolve: {
-    movies: MoviesResolver
-  },
   children: [{
     path: 'ag-grid',
     component: MoviesAgGridComponent
   }, {
     path: 'ngx-datatable',
-    component: MoviesNgxDatatableComponent
+    component: MoviesNgxDatatableComponent,
+    resolve: {
+      movies: MoviesResolver
+    }
   }]
 }];
 
 @NgModule({
-  declarations: [MoviesPageComponent, MoviesAgGridComponent, MoviesNgxDatatableComponent],
+  declarations: [MoviesPageComponent, MoviesAgGridComponent, MoviesNgxDatatableComponent, StatusComponent],
+  // providers: [MoviesListService],
   imports: [
     HttpClientModule,
     NgxDatatableModule,

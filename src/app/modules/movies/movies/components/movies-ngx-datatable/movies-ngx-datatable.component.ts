@@ -8,7 +8,8 @@ import {take} from 'rxjs/operators';
 @Component({
   selector: 'app-movies-ngx-datatable',
   templateUrl: './movies-ngx-datatable.component.html',
-  styleUrls: ['./movies-ngx-datatable.component.scss']
+  styleUrls: ['./movies-ngx-datatable.component.scss'],
+  providers: [MoviesListService]
 })
 export class MoviesNgxDatatableComponent implements OnInit {
 

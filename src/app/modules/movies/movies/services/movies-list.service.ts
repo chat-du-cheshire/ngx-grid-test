@@ -37,7 +37,17 @@ export class MoviesListService {
 
   filterParams = {};
 
-  constructor(private http: HttpClient) {
+
+  get requestParams() {
+    return Object.assign({}, this.defaultRequestParams, this.filterParams);
+  }
+
+  constructor(private http: HttpClient, protected route: ActivatedRoute) {
+    route.data.pipe(take(1)).subscribe(({movies}) => {
+      // console.log(items);
+      this._currentPage++;
+      this.setItems(movies);
+    });
   }
 
   /**
@@ -146,7 +156,6 @@ export class MoviesListService {
   }
 
   onActivate($event) {
-    console.log($event)
     switch ($event.type) {
       case 'click': {
         this.selectItem($event.row);
