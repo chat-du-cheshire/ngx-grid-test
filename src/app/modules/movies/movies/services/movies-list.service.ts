@@ -4,25 +4,38 @@ import {environment} from '../../../../../environments/environment';
 import {IMovie} from '../interfaces/IMovie';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {take, tap} from 'rxjs/operators';
-import {xor} from 'lodash';
+import {xor, isArray, omit} from 'lodash';
+import {BehaviorSubject} from 'rxjs';
+import {ActivatedRoute} from '@angular/router';
 
-@Injectable({
-  providedIn: 'root'
-})
+function getHttpParamsFromObject(value: any): HttpParams {
+  return new HttpParams({fromObject: value});
+}
+
+@Injectable()
 export class MoviesListService {
   isLoading = false;
   itemHeight = 48;
   headerHeight = 48;
   private _currentPage = 1;
   private _itemsPerPage = 50;
+
   url = `${environment.api}/movies`;
 
   items: IMovie[] = null;
+  items$ = new BehaviorSubject<IMovie[]>(this.items);
+
   protected handleScroll: (...args: any[]) => void;
 
   private _prevSelected = null;
+
   selectedItem: IMovie[] = [];
+  selectedItem$ = new BehaviorSubject<IMovie[]>(this.selectedItem);
+
   checkedItems: IMovie[] = [];
+  checkedItems$ = new BehaviorSubject<IMovie[]>(this.checkedItems);
+
+  filterParams = {};
 
   constructor(private http: HttpClient) {
   }
@@ -39,7 +52,7 @@ export class MoviesListService {
    * Запрос данных на сервер
    */
   makeRequest() {
-    const params = this.getRequestParams();
+    const params = getHttpParamsFromObject(this.requestParams);
     this.isLoading = true;
     return this.http.get<IMovie[]>(this.url, {params});
   }
@@ -47,11 +60,33 @@ export class MoviesListService {
   /**
    * Параметры запроса на сервер
    */
-  getRequestParams(): HttpParams {
-    let params = new HttpParams();
-    params = params.set('_page', String(this._currentPage++));
-    params = params.set('_limit', String(this._itemsPerPage));
-    return params;
+  get defaultRequestParams() {
+    return {
+      _page: String(this._currentPage++),
+      _limit: String(this._itemsPerPage)
+    };
+  }
+
+  search(value: string, fields: string | string[]) {
+    this._currentPage = 1;
+    let filterParams = this.filterParams;
+    if (typeof fields === 'string') {
+      filterParams = value ? {[fields + '_like']: value} : delete filterParams[fields + '_like'];
+    }
+
+    if (isArray(fields)) {
+      const reducer = value
+        ? (a, k) => ({...a, [k]: value})
+        : (a, k) => omit(a, [k]);
+
+      filterParams = (fields as string[]).reduce(reducer, value ? {} : filterParams);
+    }
+
+    this.updateFilterParams(filterParams);
+    this.subscribeRequest((items) => {
+      this.handleScroll(0);
+      this.setItems(items);
+    });
   }
 
   /**
@@ -59,8 +94,8 @@ export class MoviesListService {
    */
   load() {
     this.subscribeRequest((items) => {
-      this.setItems(items);
       this.handleScroll(0);
+      this.setItems(items);
     });
   }
 
@@ -136,10 +171,12 @@ export class MoviesListService {
   selectItem(item) {
     this._prevSelected = this.selectedItem && this.selectedItem[0];
     this.selectedItem = [item];
+    this.selectedItem$.next(this.selectedItem);
   }
 
   toggleCheckedItem(item) {
     this.checkedItems = xor(this.checkedItems, [item]);
+    this.checkedItems$.next(this.checkedItems);
   }
 
   /**
@@ -149,13 +186,25 @@ export class MoviesListService {
   setItems(items: IMovie[]) {
     this.isLoading = false;
     this.items = items;
+    this.items$.next(this.items);
+    if (!this.selectedItem.length) {
+      this.selectItem(items[0]);
+    }
+  }
+
+  updateFilterParams(params: any) {
+    this.filterParams = {...this.filterParams, ...params};
   }
 
   rowClass() {
-    const rowClass = (row) => ({
-      'row-selected': this.selectedItem && this.selectedItem.includes(row),
-      'row-checked': this.checkedItems && this.checkedItems.includes(row)
-    });
+    const rowClass = (row) => {
+      const isSelected = Boolean(this.selectedItem && this.selectedItem.find(selectedRow => selectedRow.id === row.id));
+      const isChecked = Boolean(this.checkedItems && this.checkedItems.find(checkedRow => checkedRow.id === row.id));
+      return {
+        'row-selected': isSelected,
+        'row-checked': isChecked
+      };
+    };
 
     return rowClass;
   }

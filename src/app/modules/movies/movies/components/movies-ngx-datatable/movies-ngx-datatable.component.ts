@@ -1,7 +1,9 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {MoviesStateService} from '../../services/movies-state.service';
 import {MoviesListService} from '../../services/movies-list.service';
 import {DatatableComponent} from '@swimlane/ngx-datatable';
+import {ActivatedRoute} from '@angular/router';
+import {take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-movies-ngx-datatable',
@@ -11,13 +13,19 @@ import {DatatableComponent} from '@swimlane/ngx-datatable';
 export class MoviesNgxDatatableComponent implements OnInit {
 
   @ViewChild(DatatableComponent) table: DatatableComponent;
+  @ViewChild('watchedTpl') watchedTpl: TemplateRef<any>;
 
-  constructor(public state: MoviesStateService,
-              public list: MoviesListService,
-              public el: ElementRef) { }
+  ngxColumns;
+
+  constructor(public list: MoviesListService,
+              public el: ElementRef) {
+  }
 
   ngOnInit() {
-    // this.list.load();
+    this.ngxColumns = [
+      {prop: 'title', name: 'Title'},
+      {prop: 'watched', name: 'Watched', cellTemplate: this.watchedTpl}
+    ];
     this.list.setScrollHandler(this.getScrollToFn());
   }
 

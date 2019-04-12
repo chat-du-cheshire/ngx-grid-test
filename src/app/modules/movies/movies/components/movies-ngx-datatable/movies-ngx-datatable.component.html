@@ -1,7 +1,7 @@
 <ngx-datatable class="bootstrap"
                [columnMode]="'force'"
                [scrollbarV]="true"
-               [columns]="state.ngxColumns"
+               [columns]="ngxColumns"
                [rowHeight]="list.itemHeight"
                [headerHeight]="list.headerHeight"
                [footerHeight]="0"
@@ -12,3 +12,6 @@
                (scroll)="list.onScroll($event, el)">
   
 </ngx-datatable>
+<ng-template #watchedTpl let-row="row" let-value="value">
+  <app-status [value]="value"></app-status>
+</ng-template>
