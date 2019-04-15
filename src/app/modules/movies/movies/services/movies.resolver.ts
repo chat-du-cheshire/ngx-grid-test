@@ -1,17 +1,17 @@
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs';
+import {forkJoin, Observable, of} from 'rxjs';
 import {IMovie} from '../interfaces/IMovie';
-import {MoviesListService} from './movies-list.service';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
+import {switchMap} from 'rxjs/operators';
 
 @Injectable({providedIn: 'root'})
-export class MoviesResolver implements Resolve<Observable<IMovie[]>> {
+export class MoviesResolver implements Resolve<Observable<[IMovie[], IMovie]>> {
   constructor(private http: HttpClient) {
   }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<IMovie[]> {
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<[IMovie[], IMovie]> {
     return this.http.get<IMovie[]>(`${environment.api}/movies`, {
       params: new HttpParams({
         fromObject: {
@@ -19,6 +19,8 @@ export class MoviesResolver implements Resolve<Observable<IMovie[]>> {
           _limit: String(50)
         }
       })
-    });
+    }).pipe(
+      switchMap((items) => forkJoin([of(items), this.http.get<IMovie>(`${environment.api}/movies/${items[0].id}`)]))
+    );
   }
 }

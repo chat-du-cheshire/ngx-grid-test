@@ -29,8 +29,8 @@ export class MoviesListService {
 
   private _prevSelected = null;
 
-  selectedItem: IMovie[] = [];
-  selectedItem$ = new BehaviorSubject<IMovie[]>(this.selectedItem);
+  selectedItem: IMovie = null;
+  selectedItem$ = new BehaviorSubject<IMovie>(this.selectedItem);
 
   checkedItems: IMovie[] = [];
   checkedItems$ = new BehaviorSubject<IMovie[]>(this.checkedItems);
@@ -43,8 +43,12 @@ export class MoviesListService {
   }
 
   constructor(private http: HttpClient, protected route: ActivatedRoute) {
-    route.data.pipe(take(1)).subscribe(({movies}) => {
-      // console.log(items);
+    this.subscribeRouteData();
+  }
+
+  private subscribeRouteData() {
+    this.route.data.pipe(take(1)).subscribe(({data}) => {
+      const [movies] = data;
       this._currentPage++;
       this.setItems(movies);
     });
@@ -100,21 +104,14 @@ export class MoviesListService {
   }
 
   /**
-   * Принудительная загрузка данных с сервера
-   */
-  load() {
-    this.subscribeRequest((items) => {
-      this.handleScroll(0);
-      this.setItems(items);
-    });
-  }
-
-  /**
    * Перезапрашиваем данные с сервера
    */
   reload() {
     this._currentPage = 1;
-    this.load();
+    this.subscribeRequest((items) => {
+      this.handleScroll(0);
+      this.setItems(items);
+    });
   }
 
   /**
@@ -178,8 +175,8 @@ export class MoviesListService {
   }
 
   selectItem(item) {
-    this._prevSelected = this.selectedItem && this.selectedItem[0];
-    this.selectedItem = [item];
+    this._prevSelected = this.selectedItem;
+    this.selectedItem = item;
     this.selectedItem$.next(this.selectedItem);
   }
 
@@ -196,7 +193,7 @@ export class MoviesListService {
     this.isLoading = false;
     this.items = items;
     this.items$.next(this.items);
-    if (!this.selectedItem.length) {
+    if (!this.selectedItem) {
       this.selectItem(items[0]);
     }
   }
@@ -205,9 +202,9 @@ export class MoviesListService {
     this.filterParams = {...this.filterParams, ...params};
   }
 
-  rowClass() {
+  get rowClass() {
     const rowClass = (row) => {
-      const isSelected = Boolean(this.selectedItem && this.selectedItem.find(selectedRow => selectedRow.id === row.id));
+      const isSelected = this.selectedItem.id === row.id;
       const isChecked = Boolean(this.checkedItems && this.checkedItems.find(checkedRow => checkedRow.id === row.id));
       return {
         'row-selected': isSelected,

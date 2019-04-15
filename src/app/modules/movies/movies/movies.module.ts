@@ -20,14 +20,13 @@ const moviesRoutes: Route[] = [{
     path: 'ngx-datatable',
     component: MoviesNgxDatatableComponent,
     resolve: {
-      movies: MoviesResolver
+      data: MoviesResolver
     }
   }]
 }];
 
 @NgModule({
   declarations: [MoviesPageComponent, MoviesAgGridComponent, MoviesNgxDatatableComponent, StatusComponent],
-  // providers: [MoviesListService],
   imports: [
     HttpClientModule,
     NgxDatatableModule,
