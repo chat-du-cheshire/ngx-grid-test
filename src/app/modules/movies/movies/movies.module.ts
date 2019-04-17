@@ -9,13 +9,17 @@ import {HttpClientModule} from '@angular/common/http';
 import {MoviesResolver} from './services/movies.resolver';
 import { StatusComponent } from './components/status/status.component';
 import {MoviesListService} from './services/movies-list.service';
+import {AgGridModule} from 'ag-grid-angular';
 
 const moviesRoutes: Route[] = [{
   path: 'movies',
   component: MoviesPageComponent,
   children: [{
     path: 'ag-grid',
-    component: MoviesAgGridComponent
+    component: MoviesAgGridComponent,
+    resolve: {
+      data: MoviesResolver
+    }
   }, {
     path: 'ngx-datatable',
     component: MoviesNgxDatatableComponent,
@@ -31,6 +35,7 @@ const moviesRoutes: Route[] = [{
     HttpClientModule,
     NgxDatatableModule,
     CommonModule,
+    AgGridModule.withComponents([]),
     RouterModule.forChild(moviesRoutes)
   ]
 })

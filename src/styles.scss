@@ -4,6 +4,9 @@
 @import '~@swimlane/ngx-datatable/release/index.css';
 @import '~@swimlane/ngx-datatable/release/themes/bootstrap.css';
 
+@import "~ag-grid-community/dist/styles/ag-grid.css";
+@import "~ag-grid-community/dist/styles/ag-theme-balham.css";
+
 .page {
   height: 100vh;
 
@@ -26,6 +29,9 @@
   }
 }
 
+.table-wrap {
+  overflow: auto;
+}
 
 
 datatable-body-row {

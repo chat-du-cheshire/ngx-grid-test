@@ -1,3 +1,13 @@
-<p>
-  movies-ag-grid works!
-</p>
+<div class="row h-100">
+  <div class="col-6 h-100 table-wrap">
+    <ag-grid-angular
+      class="ag-theme-balham h-100"
+      [rowData]="list.items"
+      [columnDefs]="agColumns"
+      (gridReady)="onGridReady($event)"
+      (bodyScroll)="onBodyScroll($event)">
+    </ag-grid-angular>
+  </div>
+  <div class="col-6">
+  </div>
+</div>
