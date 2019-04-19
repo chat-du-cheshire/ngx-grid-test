@@ -38,6 +38,16 @@ export class MoviesListService {
   filterParams = {};
 
 
+  /**
+   * Параметры запроса на сервер
+   */
+  get defaultRequestParams() {
+    return {
+      _page: String(this._currentPage++),
+      _limit: String(this._itemsPerPage)
+    };
+  }
+
   get requestParams() {
     return Object.assign({}, this.defaultRequestParams, this.filterParams);
   }
@@ -69,16 +79,6 @@ export class MoviesListService {
     const params = getHttpParamsFromObject(this.requestParams);
     this.isLoading = true;
     return this.http.get<IMovie[]>(this.url, {params});
-  }
-
-  /**
-   * Параметры запроса на сервер
-   */
-  get defaultRequestParams() {
-    return {
-      _page: String(this._currentPage++),
-      _limit: String(this._itemsPerPage)
-    };
   }
 
   search(value: string, fields: string | string[]) {

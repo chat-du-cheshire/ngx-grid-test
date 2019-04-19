@@ -16,10 +16,7 @@ const moviesRoutes: Route[] = [{
   component: MoviesPageComponent,
   children: [{
     path: 'ag-grid',
-    component: MoviesAgGridComponent,
-    resolve: {
-      data: MoviesResolver
-    }
+    component: MoviesAgGridComponent
   }, {
     path: 'ngx-datatable',
     component: MoviesNgxDatatableComponent,

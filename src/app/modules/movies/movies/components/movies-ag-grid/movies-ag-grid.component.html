@@ -2,10 +2,16 @@
   <div class="col-6 h-100 table-wrap">
     <ag-grid-angular
       class="ag-theme-balham h-100"
-      [rowData]="list.items"
+      [datasource]="list"
       [columnDefs]="agColumns"
-      (gridReady)="onGridReady($event)"
-      (bodyScroll)="onBodyScroll($event)">
+      [rowSelection]="'multiple'"
+      [rowModelType]="'infinite'"
+      [paginationPageSize]="list.itemsPerPage"
+      [cacheBlockSize]="list.itemsPerPage"
+      [paginationAutoPageSize]="true"
+      [rowHeight]="list.itemHeight"
+      [headerHeight]="list.headerHeight"
+      (gridReady)="onGridReady($event)">
     </ag-grid-angular>
   </div>
   <div class="col-6">
