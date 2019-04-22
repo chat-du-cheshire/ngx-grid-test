@@ -1,12 +1,15 @@
 import {Component, OnInit} from '@angular/core';
 import {MoviesListService} from '../../services/movies-list.service';
 import {AgMoviesListService} from './services/ag-movies-list.service';
+import {MoviesDetailService} from '../../services/movies-detail.service';
+import {filter, switchMap} from 'rxjs/operators';
+import {AgMoviesDetailService} from './services/ag-movies-detail.service';
 
 @Component({
   selector: 'app-movies-ag-grid',
   templateUrl: './movies-ag-grid.component.html',
   styleUrls: ['./movies-ag-grid.component.scss'],
-  providers: [AgMoviesListService]
+  providers: [AgMoviesListService, AgMoviesDetailService]
 })
 export class MoviesAgGridComponent implements OnInit {
   agColumns = [
@@ -14,10 +17,11 @@ export class MoviesAgGridComponent implements OnInit {
     {headerName: 'Watched', field: 'watched', width: 100}
   ];
 
-  constructor(public list: AgMoviesListService) {
+  constructor(public list: AgMoviesListService, public detail: AgMoviesDetailService) {
   }
 
   ngOnInit() {
+    this.list.selectedItem$.pipe(filter(item => !!item)).subscribe(item => this.detail.requestDetails(item));
   }
 
   onGridReady($event) {

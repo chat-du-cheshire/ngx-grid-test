@@ -1,19 +1,48 @@
 <div class="row h-100">
   <div class="col-6 h-100 table-wrap">
-    <ag-grid-angular
-      class="ag-theme-balham h-100"
-      [datasource]="list"
-      [columnDefs]="agColumns"
-      [rowSelection]="'multiple'"
-      [rowModelType]="'infinite'"
-      [paginationPageSize]="list.itemsPerPage"
-      [cacheBlockSize]="list.itemsPerPage"
-      [paginationAutoPageSize]="true"
-      [rowHeight]="list.itemHeight"
-      [headerHeight]="list.headerHeight"
-      (gridReady)="onGridReady($event)">
-    </ag-grid-angular>
+    <div class="movies-ag__search">
+      <div class="input-group">
+        <input class="form-control" (change)="list.onSearch($event.target.value, 'title')">
+        <div class="input-group-append">
+          <div class="input-group-text">Watched:
+            <div class="form-check form-check-inline">
+              <input (change)="list.onFilter($event.target.value, 'watched')" class="form-check-input" type="radio" name="watched" [value]="null">
+              <label class="form-check-label">None</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input (change)="list.onFilter($event.target.value, 'watched')" class="form-check-input" type="radio" name="watched" [value]="false">
+              <label class="form-check-label">Unwatched</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input (change)="list.onFilter($event.target.value, 'watched')" class="form-check-input" type="radio" name="watched" [value]="true">
+              <label class="form-check-label">Watched</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="movies-ag__grid">
+      <ag-grid-angular
+        class="ag-theme-balham h-100"
+        [datasource]="list"
+        [columnDefs]="agColumns"
+        [rowSelection]="'multiple'"
+        [rowModelType]="'infinite'"
+        [paginationPageSize]="list.itemsPerPage"
+        [cacheBlockSize]="list.itemsPerPage"
+        [paginationAutoPageSize]="true"
+        [rowHeight]="list.itemHeight"
+        [headerHeight]="list.headerHeight"
+        [isExternalFilterPresent]="list.isFilterPresent"
+        [doesExternalFilterPass]="list.isFilterPass"
+        (gridReady)="list.onGridReady($event)"
+        (selectionChanged)="list.onSelectionChanged($event)"
+        (rowClicked)="list.onClicked($event)"
+        (rowSelected)="list.onSelected($event)">
+      </ag-grid-angular>
+    </div>
   </div>
   <div class="col-6">
+    <pre>{{detail.item | json}}</pre>
   </div>
 </div>
