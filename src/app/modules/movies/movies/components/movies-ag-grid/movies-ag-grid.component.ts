@@ -4,6 +4,7 @@ import {AgMoviesListService} from './services/ag-movies-list.service';
 import {MoviesDetailService} from '../../services/movies-detail.service';
 import {filter, switchMap} from 'rxjs/operators';
 import {AgMoviesDetailService} from './services/ag-movies-detail.service';
+import {StatusComponent} from '../status/status.component';
 
 @Component({
   selector: 'app-movies-ag-grid',
@@ -14,7 +15,7 @@ import {AgMoviesDetailService} from './services/ag-movies-detail.service';
 export class MoviesAgGridComponent implements OnInit {
   agColumns = [
     {headerName: 'Title', field: 'title', sortable: true, filter: true},
-    {headerName: 'Watched', field: 'watched', width: 100}
+    {headerName: 'Watched', field: 'watched', width: 100, cellRendererFramework: StatusComponent, colId: 'watched'}
   ];
 
   constructor(public list: AgMoviesListService, public detail: AgMoviesDetailService) {

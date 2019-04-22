@@ -32,7 +32,7 @@ const moviesRoutes: Route[] = [{
     HttpClientModule,
     NgxDatatableModule,
     CommonModule,
-    AgGridModule.withComponents([]),
+    AgGridModule.withComponents([StatusComponent]),
     RouterModule.forChild(moviesRoutes)
   ]
 })
