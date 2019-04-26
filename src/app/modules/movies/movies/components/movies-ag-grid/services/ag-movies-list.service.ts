@@ -101,17 +101,13 @@ export class AgMoviesListService implements IDatasource {
       filterParams = (fields as string[]).reduce(reducer, value ? {} : filterParams);
     }
 
-    this.updateFilterParams(filterParams);
+    this.filterParams = {...this.filterParams, ...filterParams};
     this.gridApi.onFilterChanged();
   }
 
   onFilter(value: boolean, fields: string | string[]) {
     console.log(value);
     this.filter(value, fields);
-  }
-
-  updateFilterParams(params: any) {
-    this.filterParams = {...this.filterParams, ...params};
   }
 
   isFilterPresent() {
@@ -124,8 +120,13 @@ export class AgMoviesListService implements IDatasource {
   }
 
   onGridReady($event) {
-    console.log($event);
+    console.log('onGridReady');
     this.gridApi = $event.api;
+  }
+
+  onFirstDataRendered($event) {
+    console.log('onFirstDataRendered');
+    $event.api.sizeColumnsToFit();
   }
 
   onSelected($event) {

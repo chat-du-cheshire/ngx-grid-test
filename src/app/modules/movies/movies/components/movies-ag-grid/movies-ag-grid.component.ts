@@ -1,10 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {MoviesListService} from '../../services/movies-list.service';
 import {AgMoviesListService} from './services/ag-movies-list.service';
-import {MoviesDetailService} from '../../services/movies-detail.service';
-import {filter, switchMap} from 'rxjs/operators';
+import {filter} from 'rxjs/operators';
 import {AgMoviesDetailService} from './services/ag-movies-detail.service';
 import {StatusComponent} from '../status/status.component';
+import {ColDef, ColGroupDef} from 'ag-grid-community/src/ts/entities/colDef';
 
 @Component({
   selector: 'app-movies-ag-grid',
@@ -13,7 +12,7 @@ import {StatusComponent} from '../status/status.component';
   providers: [AgMoviesListService, AgMoviesDetailService]
 })
 export class MoviesAgGridComponent implements OnInit {
-  agColumns = [
+  agColumns: (ColDef | ColGroupDef)[] = [
     {headerName: 'Title', field: 'title', sortable: true, filter: true},
     {headerName: 'Watched', field: 'watched', width: 100, cellRendererFramework: StatusComponent, colId: 'watched'}
   ];
