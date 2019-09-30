@@ -1,4 +1,4 @@
-import {Component, HostBinding, Input, OnInit} from '@angular/core';
+import {Component, HostBinding, Input} from '@angular/core';
 import {ICellRendererAngularComp} from 'ag-grid-angular';
 import {ICellRendererParams} from 'ag-grid-community';
 
@@ -9,13 +9,19 @@ import {ICellRendererParams} from 'ag-grid-community';
 })
 export class StatusComponent implements ICellRendererAngularComp {
   @HostBinding('class.ok') @Input() value = false;
+  params: ICellRendererParams = null;
 
   agInit(params: ICellRendererParams): void {
-    console.log(params);
+    this.params = params;
     this.value = params.value;
   }
 
   refresh(params: any): boolean {
     return false;
+  }
+
+  randomizeHeight() {
+    this.params.node.setRowHeight(Math.round(Math.random() * 10) * 10);
+    this.params.api.onRowHeightChanged();
   }
 }

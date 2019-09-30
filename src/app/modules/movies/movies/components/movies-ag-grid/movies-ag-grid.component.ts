@@ -4,6 +4,8 @@ import {filter} from 'rxjs/operators';
 import {AgMoviesDetailService} from './services/ag-movies-detail.service';
 import {StatusComponent} from '../status/status.component';
 import {ColDef, ColGroupDef} from 'ag-grid-community/src/ts/entities/colDef';
+import {BodyScrollEvent} from 'ag-grid-community';
+import {get} from 'lodash';
 
 @Component({
   selector: 'app-movies-ag-grid',
@@ -21,14 +23,35 @@ export class MoviesAgGridComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.list.subscribeRequest((items) => {
+      console.log(items);
+      this.list.setItems(items);
+    });
     this.list.selectedItem$.pipe(filter(item => !!item)).subscribe(item => this.detail.requestDetails(item));
   }
 
   onGridReady($event) {
-    // $event.api.sizeColumnsToFit();
+    $event.api.sizeColumnsToFit();
   }
 
-  onBodyScroll($event) {
-    console.log($event);
+  onFirstDataRendered($event) {
+    $event.api.sizeColumnsToFit();
+  }
+
+  onBodyScroll($event: BodyScrollEvent) {
+    const viewportScrollHeight = get($event.api, 'gridPanel.eBodyViewport.scrollHeight', 0);
+    const bottomScrollPosition = $event.api.getVerticalPixelRange().bottom;
+
+    if (viewportScrollHeight === bottomScrollPosition) {
+      this.list.subscribeRequest((items) => {
+        $event.api.addItems(items);
+        this.list.extendItems(items);
+        // this.list.setItems(this.list.items.concat(items));
+      });
+    }
+  }
+
+  onScroll($event: UIEvent) {
+    console.log('onScroll', $event);
   }
 }

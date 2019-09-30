@@ -2,7 +2,7 @@
   <div class="col-6 h-100 table-wrap">
     <div class="movies-ag__search">
       <div class="input-group">
-        <input class="form-control" (change)="list.onSearch($event.target.value, 'title')">
+        <input class="form-control" type="search" (change)="list.onSearch($event.target.value, 'title')">
         <div class="input-group-append">
           <div class="input-group-text">Watched:
             <div class="form-check form-check-inline">
@@ -18,28 +18,27 @@
               <label class="form-check-label">Watched</label>
             </div>
           </div>
+          <button (click)="list.getCount()">Click</button>
         </div>
       </div>
     </div>
     <div class="movies-ag__grid">
       <ag-grid-angular
         class="ag-theme-balham h-100"
-        [datasource]="list"
         [columnDefs]="agColumns"
         [rowSelection]="'multiple'"
-        [rowModelType]="'infinite'"
-        [paginationPageSize]="list.itemsPerPage"
-        [cacheBlockSize]="list.itemsPerPage"
-        [paginationAutoPageSize]="true"
+        [rowData]="list.items"
         [rowHeight]="list.itemHeight"
         [headerHeight]="list.headerHeight"
         [isExternalFilterPresent]="list.isFilterPresent"
         [doesExternalFilterPass]="list.isFilterPass"
-        (gridReady)="list.onGridReady($event)"
+        (scroll)="onScroll($event)"
+        (bodyScroll)="onBodyScroll($event)"
+        (firstDataRendered)="onFirstDataRendered($event)"
+        (gridReady)="onGridReady($event)"
         (selectionChanged)="list.onSelectionChanged($event)"
         (rowClicked)="list.onClicked($event)"
-        (rowSelected)="list.onSelected($event)"
-        (firstDataRendered)="list.onFirstDataRendered($event)">
+        (rowSelected)="list.onSelected($event)">
       </ag-grid-angular>
     </div>
   </div>

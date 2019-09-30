@@ -4,7 +4,7 @@ import {environment} from '../../../../../environments/environment';
 import {IMovie} from '../interfaces/IMovie';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {take, tap} from 'rxjs/operators';
-import {xor, isArray, omit} from 'lodash';
+import {isArray, omit, xor} from 'lodash';
 import {BehaviorSubject} from 'rxjs';
 import {ActivatedRoute} from '@angular/router';
 
@@ -202,16 +202,12 @@ export class MoviesListService {
     this.filterParams = {...this.filterParams, ...params};
   }
 
-  get rowClass() {
-    const rowClass = (row) => {
-      const isSelected = this.selectedItem.id === row.id;
-      const isChecked = Boolean(this.checkedItems && this.checkedItems.find(checkedRow => checkedRow.id === row.id));
-      return {
-        'row-selected': isSelected,
-        'row-checked': isChecked
-      };
+  rowClass = (row) => {
+    const isSelected = this.selectedItem === row;
+    const isChecked = Boolean((this.checkedItems || []).find(checkedRow => checkedRow.id === row.id));
+    return {
+      'row-selected': isSelected,
+      'row-checked': isChecked
     };
-
-    return rowClass;
-  }
+  };
 }

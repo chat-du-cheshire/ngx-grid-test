@@ -66,10 +66,11 @@ export class AgMoviesListService implements IDatasource {
     console.log(params);
     this.subscribeRequest((items) => {
       params.successCallback(items, params.endRow > 1000 ? 1000 : undefined);
+      this.gridApi.sizeColumnsToFit();
     });
   }
 
-  protected subscribeRequest(fn: (items: IMovie[]) => void) {
+  subscribeRequest(fn: (items: IMovie[]) => void) {
     this.makeRequest()
       .pipe(take(1))
       .subscribe(fn);
@@ -126,7 +127,8 @@ export class AgMoviesListService implements IDatasource {
 
   onFirstDataRendered($event) {
     console.log('onFirstDataRendered');
-    $event.api.sizeColumnsToFit();
+    // setTimeout(() => $event.api.sizeColumnsToFit(), 3000)
+    // $event.api.sizeColumnsToFit();
   }
 
   onSelected($event) {
@@ -149,4 +151,14 @@ export class AgMoviesListService implements IDatasource {
     this._selectedItem$.next(this.selectedItem);
   }
 
+  getCount() {
+    console.log(this.gridApi);
+    // console.log(this.gridApi.p);
+  }
+
+  extendItems(items: IMovie[]) {
+    this.isLoading = false;
+    this.items.push(...items);
+    this.items$.next(this.items);
+  }
 }
